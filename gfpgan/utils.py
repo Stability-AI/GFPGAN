@@ -99,7 +99,14 @@ class GFPGANer():
         self.gfpgan = self.gfpgan.to(self.device)
 
     @torch.no_grad()
-    def enhance(self, img, has_aligned=False, only_center_face=False, paste_back=True, weight=0.5):
+    def enhance(self,
+                img,
+                has_aligned=False,
+                only_center_face=False,
+                paste_back=True,
+                weight=0.5,
+                max_faces=12,
+                eye_dist_threshold=5):
         self.face_helper.clean_all()
 
         if has_aligned:  # the inputs are already aligned
@@ -108,11 +115,15 @@ class GFPGANer():
         else:
             self.face_helper.read_image(img)
             # get face landmarks for each face
-            self.face_helper.get_face_landmarks_5(only_center_face=only_center_face, eye_dist_threshold=5)
+            self.face_helper.get_face_landmarks_5(only_center_face=only_center_face, eye_dist_threshold=eye_dist_threshold)
             # eye_dist_threshold=5: skip faces whose eye distance is smaller than 5 pixels
             # TODO: even with eye_dist_threshold, it will still introduce wrong detections and restorations.
             # align and warp each face
             self.face_helper.align_warp_face()
+
+        if len(self.face_helper.cropped_faces) > max_faces:
+            # Only restore the first max_faces faces
+            self.face_helper.cropped_faces = self.face_helper.cropped_faces[:max_faces]
 
         # face restoration
         for cropped_face in self.face_helper.cropped_faces:

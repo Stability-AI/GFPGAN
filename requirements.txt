@@ -1,5 +1,5 @@
 basicsr>=1.4.2
-facexlib @ git+https://github.com/Stability-AI/facexlib@54e7fb38899474db2e36ab2b42d051502cd131fd
+facexlib @ git+https://github.com/Stability-AI/facexlib@fe7a060f6940f14647f175cd198abdc599e2126e
 lmdb
 numpy
 opencv-python
